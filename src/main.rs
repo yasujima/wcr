@@ -1,8 +1,7 @@
-use clap::{Arg, App};
+use clap::{App, Arg};
 use std::error::Error;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -43,13 +42,16 @@ pub fn count(mut file: impl BufRead) -> MyResult<FileInfo> {
     }
 
     Ok(FileInfo {
-        lines, words, bytes, chars
+        lines,
+        words,
+        bytes,
+        chars,
     })
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{count, FileInfo};
+    use super::{FileInfo, count};
     use std::io::Cursor;
 
     #[test]
@@ -57,11 +59,11 @@ mod tests {
         let text = "I don't want the world, I just want your half.\r\n";
         let info = count(Cursor::new(text));
         assert!(info.is_ok());
-        let expected = FileInfo{
-            lines:1,
-            words:10,
-            bytes:48,
-            chars:48,
+        let expected = FileInfo {
+            lines: 1,
+            words: 10,
+            bytes: 48,
+            chars: 48,
         };
         assert_eq!(info.unwrap(), expected);
     }
@@ -152,12 +154,11 @@ fn format_field(value: usize, show: bool) -> String {
 }
 
 fn run(config: Config) -> MyResult<()> {
-
     let mut lines = 0;
     let mut words = 0;
     let mut bytes = 0;
     let mut chars = 0;
-    
+
     for filename in &config.files {
         match open(filename) {
             Err(err) => eprintln!("{}: {}", filename, err),
@@ -180,7 +181,6 @@ fn run(config: Config) -> MyResult<()> {
                     words += info.words;
                     bytes += info.bytes;
                     chars += info.chars;
-                            
                 }
             }
         }
@@ -195,6 +195,5 @@ fn run(config: Config) -> MyResult<()> {
             format_field(chars, config.chars),
         );
     }
-    
     Ok(())
 }
